@@ -1,0 +1,6 @@
+import model sm
+generate mu+ mu- > t t~, t > b j j, t~ > b~ j j
+add process mu+ mu- > t t~, t > b ta+ vt, t~ > b~ ta- vt~
+add process mu+ mu- > t t~, t > b j j, t~ > b~ ta- vt~
+add process mu+ mu- > t t~, t > b ta+ vt, t~ > b~ j j
+output mumutt

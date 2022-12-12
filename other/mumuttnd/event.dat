@@ -1,0 +1,11 @@
+launch mumutt
+
+analysis=ExRoot
+shower=Pythia8
+detector=Delphes
+
+done
+
+run_card.dat
+
+done
