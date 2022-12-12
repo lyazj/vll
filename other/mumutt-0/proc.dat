@@ -1,0 +1,3 @@
+import model sm
+generate mu+ mu- > t t~, t > b j j, t~ > b~ j j
+output mumutt
