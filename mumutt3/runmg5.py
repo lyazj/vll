@@ -15,7 +15,7 @@ args = parser.parse_args()
 # directory = args.directory
 # number = args.number
 # script = args.script
-thread = args.thread or int(__import__('multiprocessing').cpu_count())
+thread = args.thread or int(math.ceil(__import__('multiprocessing').cpu_count() / 2))
 
 # debug
 script = 'event.dat'
