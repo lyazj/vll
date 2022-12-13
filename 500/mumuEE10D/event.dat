@@ -27,8 +27,8 @@ set param_card zetaRd33 0
 set param_card zetaRe33 0
 
 
-set param_card mln 900
-set param_card mle 900
+set param_card mln 500
+set param_card mle 500
 
 set decay wZp Auto
 set decay wVlq Auto
