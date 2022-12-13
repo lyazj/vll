@@ -2,4 +2,4 @@ import model sm
 generate mu+ mu- > t t~
 output mumutt
 !cp run_card.dat mumutt/Cards/run_card.dat
-!cp ../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumutt/Cards/delphes_card.dat
+!cp ../../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumutt/Cards/delphes_card.dat
