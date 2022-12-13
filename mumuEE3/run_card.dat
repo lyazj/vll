@@ -18,7 +18,7 @@
 #*********************************************************************
 # Tag name for the run (one word)                                    *
 #*********************************************************************
-  mumutt    = run_tag ! name of the run  # MODIFIED
+  mumuEE    = run_tag ! name of the run  # MODIFIED
 #*********************************************************************
 # Number of events and rnd seed                                      *
 # Warning: Do not generate more than 1M events in a single run       *
@@ -32,8 +32,8 @@
 #*********************************************************************
      0        = lpp1    ! beam 1 type  # MODIFIED
      0        = lpp2    ! beam 2 type  # MODIFIED
-     6500.0     = ebeam1  ! beam 1 total energy in GeV
-     6500.0     = ebeam2  ! beam 2 total energy in GeV
+     1500.0     = ebeam1  ! beam 1 total energy in GeV
+     1500.0     = ebeam2  ! beam 2 total energy in GeV
 # To see polarised beam options: type "update beam_pol"
 
 #*********************************************************************

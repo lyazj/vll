@@ -1,0 +1,4 @@
+import model sm
+generate mu+ mu- > t t~
+output mumutt
+!cp run_card.dat mumutt/Cards
