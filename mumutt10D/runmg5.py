@@ -19,12 +19,12 @@ thread = args.thread or int(math.ceil(__import__('multiprocessing').cpu_count() 
 
 # debug
 script = 'event.dat'
-directory = 'mumuEE'
-number = 10000
-thread = 16
+directory = 'mumutt'
+number = 50000
 
-batch_min = 10000
-batch = max(int(math.ceil(number / thread)), batch_min)
+batch_min = 1000
+# batch = max(int(math.ceil(number / thread)), batch_min)
+batch = batch_min
 
 with open(script) as f:
     script_content = f.read()
@@ -47,7 +47,7 @@ def waitpid(pid=-1, options=0):
             logging.warning(f'process {pid} exited with code {code}')
             return pid, 1
         else:
-            logging.info(f'process {pid} exited with code {code}')
+            logging.debug(f'process {pid} exited with code {code}')
             return pid, 0
     signal = os.WTERMSIG(status)
     logging.warning(f'process {pid} terminated by signal {signal}')
@@ -166,7 +166,7 @@ def get_nwd(directory):
         nwd = os.path.join(d, f'{b}-{seed}')
         code = mkdir(nwd)
         if code == 0:
-            logging.info(f'new working directory: {nwd}')
+            logging.debug(f'new working directory: {nwd}')
             return seed, nwd
 
 def write_runcard(directory, seed, number):
@@ -197,7 +197,7 @@ def init_run(*args, **kwargs):
     write_runcard(os.path.join(nwd, directory, 'Cards'), seed, number)
     write_script(nwd)
     os.chdir(nwd)
-    logging.info(f'working directory ready: {nwd}')
+    logging.debug(f'working directory ready: {nwd}')
     rd0 = '/dev/null'
     rd1 = 'runmg5-1.log'
     rd2 = 'runmg5-2.log'
@@ -210,12 +210,16 @@ def init_run(*args, **kwargs):
 def get_number(directory):
     with open(os.path.join(directory, 'runmg5-1.log')) as f:
         log = f.read()
-    nb = re.findall(r'^\s*Nb of events\s*:\s*(.*?)$', log, re.M)
-    if len(nb) != 1:
+    nb = re.findall(r'^\s*Nb of events\s*:\s*(\S+)\s*$', log, re.M)
+    if not nb:
         logging.warning(f'result: {directory}: {nb} (failed)')
         return 0
+    for i in nb[1:]:
+        if i != nb[0]:
+            logging.warning(f'result: {directory}: {nb} (failed)')
+            return 0
     try:
-        nb = int(*nb)
+        nb = int(nb[0])
     except ValueError:
         logging.warning(f'result: {directory}: {nb} (failed)')
         return 0
