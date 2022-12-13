@@ -2,6 +2,8 @@ set nb_core 1
 launch mumuEE
 
 analysis=ExRoot
+shower=Pythia8
+detector=Delphes
 
 done
 
