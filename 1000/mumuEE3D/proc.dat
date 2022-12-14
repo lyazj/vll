@@ -6,3 +6,4 @@ add process mu+ mu- > Le+ Le- QED=2 NP=0, Le- > ta- b b~, Le+ > ta+ b~ b
 output mumuEE
 !cp run_card.dat mumuEE/Cards
 !cp ../../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumuEE/Cards/delphes_card.dat
+!cp -r ../../MG5_aMC/Delphes/cards/MuonCollider mumuEE/Cards/MuonCollider
