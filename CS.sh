@@ -1,6 +1,11 @@
 #!/bin/bash
 
 for log in */*/*-1/runmg5-1.log; do
-    printf '%-32s' "$(dirname ${log}): "
-    (grep Cross-section ${log} || echo - - failed) | uniq | awk '{print $3" "$4" "$5" "$6}'
+    CS="$(grep Cross-section ${log} | uniq)"
+    if [ -z "${CS}" ]; then
+        CS="failed"
+    else
+        CS="${CS:23}"
+    fi
+    printf '%-32s%s\n' "$(dirname ${log}): " "${CS}"
 done
