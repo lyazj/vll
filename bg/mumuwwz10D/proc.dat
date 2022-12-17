@@ -1,0 +1,6 @@
+import model sm
+generate mu+ mu- > w+ w- z
+output mumuwwz
+!cp run_card.dat mumuwwz/Cards/run_card.dat
+!cp ../../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumuwwz/Cards/delphes_card.dat
+!cp -r ../../MG5_aMC/Delphes/cards/MuonCollider mumuwwz/Cards/MuonCollider
