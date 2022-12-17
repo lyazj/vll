@@ -7,5 +7,5 @@ for log in */*/*-1/runmg5-1.log; do
     else
         CS="${CS:23}"
     fi
-    printf '%-32s%s\n' "$(dirname ${log}): " "${CS}"
+    printf '%-36s%s\n' "$(dirname ${log}): " "${CS}"
 done
