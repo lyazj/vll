@@ -1,0 +1,9 @@
+import model VLferm_UFO
+generate    mu+ mu- > Ln Ln~ QED=2 NP=0, Ln > t t~ vt,  Ln~ > t~ t vt~
+add process mu+ mu- > Ln Ln~ QED=2 NP=0, Ln > t b~ ta-, Ln~ > t~ t vt~
+add process mu+ mu- > Ln Ln~ QED=2 NP=0, Ln > t t~ vt,  Ln~ > t~ b ta+
+add process mu+ mu- > Ln Ln~ QED=2 NP=0, Ln > t b~ ta-, Ln~ > t~ b ta+
+output mumuNN
+!cp run_card.dat mumuNN/Cards
+!cp ../../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumuNN/Cards/delphes_card.dat
+!cp -r ../../MG5_aMC/Delphes/cards/MuonCollider mumuNN/Cards/MuonCollider
