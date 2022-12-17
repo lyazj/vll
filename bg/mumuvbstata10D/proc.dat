@@ -1,0 +1,6 @@
+import model sm
+generate mu+ mu- > vm~ vm ta+ ta-
+output mumuvbstata
+!cp run_card.dat mumuvbstata/Cards/run_card.dat
+!cp ../../MG5_aMC/Delphes/cards/delphes_card_MuonColliderDet.tcl mumuvbstata/Cards/delphes_card.dat
+!cp -r ../../MG5_aMC/Delphes/cards/MuonCollider mumuvbstata/Cards/MuonCollider
