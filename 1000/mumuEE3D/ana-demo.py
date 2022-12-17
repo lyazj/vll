@@ -18,7 +18,7 @@ for rootfile in rootfiles:
 # Delphes.GetFile().Get('Delphes').Print('*VLC*')
 reader = ROOT.ExRootTreeReader(Delphes)
 
-VLCjetR05N2 = reader.UseBranch('VLCjetR05N2')
+# VLCjetR05N2 = reader.UseBranch('VLCjetR05N2')
 # VLCjetR05N3 = reader.UseBranch('VLCjetR05N3')
 # VLCjetR05N4 = reader.UseBranch('VLCjetR05N4')
 # VLCjetR05N5 = reader.UseBranch('VLCjetR05N5')
@@ -44,7 +44,7 @@ VLCjetR05N2 = reader.UseBranch('VLCjetR05N2')
 # VLCjetR15N5 = reader.UseBranch('VLCjetR15N5')
 # VLCjetR15N6 = reader.UseBranch('VLCjetR15N6')
 # VLCjetR02_inclusive = reader.UseBranch('VLCjetR02_inclusive')
-# VLCjetR05_inclusive = reader.UseBranch('VLCjetR05_inclusive')
+VLCjetR05_inclusive = reader.UseBranch('VLCjetR05_inclusive')
 # VLCjetR07_inclusive = reader.UseBranch('VLCjetR07_inclusive')
 # VLCjetR10_inclusive = reader.UseBranch('VLCjetR10_inclusive')
 # VLCjetR12_inclusive = reader.UseBranch('VLCjetR12_inclusive')
@@ -52,4 +52,4 @@ VLCjetR05N2 = reader.UseBranch('VLCjetR05N2')
 
 for entry in range(reader.GetEntries()):
     reader.ReadEntry(entry)
-    print(VLCjetR05N2[0].BTag, VLCjetR05N2[1].BTag)
+    print(*(j.BTag for j in VLCjetR05_inclusive))
