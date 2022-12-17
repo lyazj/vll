@@ -1,0 +1,9 @@
+set nb_core 1
+launch mumubbz
+
+analysis=ExRoot
+shower=Pythia8
+detector=Delphes
+
+done
+done
