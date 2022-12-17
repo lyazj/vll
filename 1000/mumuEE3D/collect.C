@@ -61,8 +61,8 @@ void collect()
   TClonesArray *BrElectron = reader->UseBranch("Electron");
   TClonesArray *BrMuon = reader->UseBranch("Muon");
   TClonesArray *VLCjetR05 = reader->UseBranch("VLCjetR05_inclusive");
-
   Long64_t entries = reader->GetEntries();
+
   TFile *outfile = new TFile("mumuEE-collect.root", "recreate");
   TTree *Collect = new TTree("Collect", "Collected features for analysis");
   TClonesArray *BrJet = new TClonesArray("Jet", 10);
