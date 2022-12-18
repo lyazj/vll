@@ -15,7 +15,7 @@ ROOT.gSystem.Load('libDelphes.so')
 Delphes = ROOT.TChain('Delphes')
 for rootfile in rootfiles:
     Delphes.Add(rootfile)
-# Delphes.GetFile().Get('Delphes').Print('*VLC*')
+# Delphes.GetFile().Get('Delphes').Print()
 reader = ROOT.ExRootTreeReader(Delphes)
 
 # VLCjetR05N2 = reader.UseBranch('VLCjetR05N2')
