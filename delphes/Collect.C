@@ -8,17 +8,89 @@
 #include <unistd.h>
 #include <err.h>
 
-vector<string> directories = {
-  "../1000/mumuEE3D",
-  "../1000/mumuEE10D",
-  "../1000/mumuNN3D",
-  "../1000/mumuNN10D",
-  "../bg/mumutt3D",
-  "../bg/mumutt10D",
-  "../bg/mumubb3D",
-  "../bg/mumubb10D",
+vector<string> branch_names = {
+  "Event",
+  "Weight",
+  "Particle",
+  "GenJet",
+  "KTjet",
+  "GenMissingET",
+  "Track",
+  "Tower",
+  "EFlowTrack",
+  "EFlowPhoton",
+  "EFlowNeutralHadron",
+  "Photon",
+  "Electron",
+  "Muon",
+  "ForwardMuon",
+  "MissingET",
+  "ScalarHT",
 };
-atomic_size_t *directory_index;
+
+vector<string> directories = {
+  "../500/mumuEE10D",
+  "../500/mumuEE3D",
+  "../500/mumuNN10D",
+  "../500/mumuNN3D",
+  "../1000/mumuEE10D",
+  "../1000/mumuEE3D",
+  "../1000/mumuNN10D",
+  "../1000/mumuNN3D",
+  "../1500/mumuEE10D",
+  "../1500/mumuEE3D",
+  "../1500/mumuNN10D",
+  "../1500/mumuNN3D",
+  "../2000/mumuEE10D",
+  "../2000/mumuEE3D",
+  "../2000/mumuNN10D",
+  "../2000/mumuNN3D",
+  "../3000/mumuEE10D",
+  "../3000/mumuEE3D",
+  "../3000/mumuNN10D",
+  "../3000/mumuNN3D",
+  "../bg/mumubb10D",
+  "../bg/mumubb3D",
+  "../bg/mumubbz10D",
+  "../bg/mumubbz3D",
+  "../bg/mumutata10D",
+  "../bg/mumutata3D",
+  "../bg/mumutataz10D",
+  "../bg/mumutataz3D",
+  "../bg/mumutt10D",
+  "../bg/mumutt3D",
+  "../bg/mumuttz10D",
+  "../bg/mumuttz3D",
+  "../bg/mumuvbsbb10D",
+  "../bg/mumuvbsbb3D",
+  "../bg/mumuvbstata10D",
+  "../bg/mumuvbstata3D",
+  "../bg/mumuvbstt10D",
+  "../bg/mumuvbstt3D",
+  "../bg/mumuvbsww10D",
+  "../bg/mumuvbsww3D",
+  "../bg/mumuww10D",
+  "../bg/mumuww3D",
+  "../bg/mumuwwz10D",
+  "../bg/mumuwwz3D",
+};
+
+Long64_t entries_max = 50000;
+
+struct Initializer {
+
+  Initializer()
+  {
+    static int init = 1;
+    if(!init)
+      return;
+    init = 0;
+
+    auto it = unique(branch_names.begin(), branch_names.end());
+    branch_names.erase(it, branch_names.end());
+  }
+
+} initializer;
 
 size_t ncpu()
 {
@@ -126,12 +198,25 @@ void Collect(const string &directory)
   TClonesArray *BrElectron = reader->UseBranch("Electron");
   TClonesArray *BrMuon = reader->UseBranch("Muon");
   TClonesArray *VLCjetR05 = reader->UseBranch("VLCjetR05_inclusive");
-  Long64_t entries = reader->GetEntries();
+  Long64_t entries = min(entries_max, reader->GetEntries());
 
   TFile *outfile = new TFile((label + "_collect_" + mass + "_" + cme + ".root").c_str(), "recreate");
   TTree *Collect = new TTree("Collect", "Collected features for analysis");
   TClonesArray *BrJet = new TClonesArray("Jet", 10);
   Collect->Branch("Jet", &BrJet);
+  for(const string &branch_name : branch_names)
+  {
+    TClonesArray *array;
+    if(branch_name == "Electron")
+      array = BrElectron;
+    else if(branch_name == "Muon")
+      array = BrMuon;
+    else if(branch_name == "VLCjetR05_inclusive")
+      array = VLCjetR05;
+    else
+      array = reader->UseBranch(branch_name.c_str());
+    Collect->Branch(branch_name.c_str(), &array);
+  }
 
   for(Long64_t entry = 0; entry < entries; ++entry)
   {
@@ -198,6 +283,7 @@ void Collect(const string &directory)
 
 void Collect(const vector<string> &directories = ::directories)
 {
+  atomic_size_t *directory_index;
   directory_index = (atomic_size_t *)mmap(NULL, sizeof *directory_index,
       PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
   if(directory_index == MAP_FAILED)
