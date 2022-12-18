@@ -184,7 +184,7 @@ bool near(const TLorentzVector &v1, const TLorentzVector &v2)
   return hypot(v1.Eta() - v2.Eta(), v1.Phi() - v2.Phi()) < 0.5;
 }
 
-void Collect(const string &directory)
+void Collect(const string &directory, bool minmode = 0)
 {
   string cme, mass;
   string label = get_label(directory, &cme, NULL, &mass);
@@ -200,7 +200,8 @@ void Collect(const string &directory)
   TClonesArray *VLCjetR05 = reader->UseBranch("VLCjetR05_inclusive");
   Long64_t entries = min(entries_max, reader->GetEntries());
 
-  TFile *outfile = new TFile((label + "_collect_" + mass + "_" + cme + ".root").c_str(), "recreate");
+  TFile *outfile = new TFile((label + "_collect_" + (minmode ? "min_" : "")
+        + mass + "_" + cme + ".root").c_str(), "recreate");
   TTree *Collect = new TTree("Collect", "Collected features for analysis");
   TClonesArray *BrJet = new TClonesArray("Jet", 10);
   Collect->Branch("Jet", &BrJet);
@@ -281,7 +282,7 @@ void Collect(const string &directory)
   delete Delphes;
 }
 
-void Collect(const vector<string> &directories = ::directories)
+void Collect(const vector<string> &directories = ::directories, bool minmode = 0)
 {
   atomic_size_t *directory_index;
   directory_index = (atomic_size_t *)mmap(NULL, sizeof *directory_index,
@@ -299,7 +300,7 @@ void Collect(const vector<string> &directories = ::directories)
     {
       size_t i;
       while((i = (*directory_index)++) < directories.size())
-        Collect(directories[i]);
+        Collect(directories[i], minmode);
       exit(0);
     }
   }
