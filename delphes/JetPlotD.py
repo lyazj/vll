@@ -112,6 +112,33 @@ plt.tight_layout()
 plt.savefig('JetEtaD3.pdf')
 
 plt.figure(figsize=(10, 6))
+for root in root3:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetMass = Collect['Jet/Jet.Mass'].array(library='np')
+            n = len(JetMass)
+            JetMass = np.concatenate(JetMass)
+            print(f'{root}: {n} events, {len(JetMass)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetMass, 50, density=True, histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetMass, 50, density=True, histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('mass distribution of b-tagged jets')
+plt.xlim(0, 200)
+plt.ylim(0, 0.05)
+plt.xlabel('mass')
+plt.ylabel('relevant strenth')
+plt.yscale('linear')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetMassD3.pdf')
+
+plt.figure(figsize=(10, 6))
 for root in root10:
     cs = CS[root]
     with uproot.open(root) as file:
@@ -165,3 +192,30 @@ plt.yscale('linear')
 plt.legend()
 plt.tight_layout()
 plt.savefig('JetEtaD10.pdf')
+
+plt.figure(figsize=(10, 6))
+for root in root10:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetMass = Collect['Jet/Jet.Mass'].array(library='np')
+            n = len(JetMass)
+            JetMass = np.concatenate(JetMass)
+            print(f'{root}: {n} events, {len(JetMass)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetMass, 50, density=True, histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetMass, 50, density=True, histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('mass distribution of b-tagged jets')
+plt.xlim(0, 500)
+plt.ylim(0, 0.02)
+plt.xlabel('mass')
+plt.ylabel('relevant strenth')
+plt.yscale('linear')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetMassD10.pdf')
