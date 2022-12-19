@@ -74,16 +74,66 @@ for root in root3:
             print(f'{root}: {n} events')
             continue
         if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
-            plt.hist(JetPT, 50, weights=(cs / n,) * len(JetPT), histtype='step', label=root.replace('_collect_min', '')[:-5])
+            plt.hist(JetPT, 50, weights=[cs / n] * len(JetPT), histtype='step', label=root.replace('_collect_min', '')[:-5])
         else:
-            plt.hist(JetPT, 50, weights=(cs / n,) * len(JetPT), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+            plt.hist(JetPT, 50, weights=[cs / n] * len(JetPT), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
 plt.title('$p_\\mathrm{T}$ distribution of b-tagged jets')
 plt.xlabel('$p_\\mathrm{T}$')
 plt.ylabel('relevant strenth')
 plt.yscale('log')
 plt.legend()
 plt.tight_layout()
-plt.savefig('JetPlotCS3.pdf')
+plt.savefig('JetPTCS3.pdf')
+
+plt.figure(figsize=(10, 6))
+for root in root3:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetEta = Collect['Jet/Jet.Eta'].array(library='np')
+            n = len(JetEta)
+            JetEta = np.concatenate(JetEta)
+            print(f'{root}: {n} events, {len(JetEta)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetEta, 50, weights=[cs / n] * len(JetEta), histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetEta, 50, weights=[cs / n] * len(JetEta), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('$\\eta$ distribution of b-tagged jets')
+plt.xlabel('$\\eta$')
+plt.ylabel('relevant strenth')
+plt.yscale('log')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetEtaCS3.pdf')
+
+plt.figure(figsize=(10, 6))
+for root in root3:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetMass = Collect['Jet/Jet.Mass'].array(library='np')
+            n = len(JetMass)
+            JetMass = np.concatenate(JetMass)
+            print(f'{root}: {n} events, {len(JetMass)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetMass, 50, weights=[cs / n] * len(JetMass), histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetMass, 50, weights=[cs / n] * len(JetMass), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('mass distribution of b-tagged jets')
+plt.xlabel('mass')
+plt.ylabel('relevant strenth')
+plt.yscale('log')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetMassCS3.pdf')
 
 plt.figure(figsize=(10, 6))
 for root in root10:
@@ -101,13 +151,65 @@ for root in root10:
             print(f'{root}: {n} events')
             continue
         if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
-            plt.hist(JetPT, 50, weights=(cs / n,) * len(JetPT), histtype='step', label=root.replace('_collect_min', '')[:-5])
+            plt.hist(JetPT, 50, weights=[cs / n] * len(JetPT), histtype='step', label=root.replace('_collect_min', '')[:-5])
         else:
-            plt.hist(JetPT, 50, weights=(cs / n,) * len(JetPT), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+            plt.hist(JetPT, 50, weights=[cs / n] * len(JetPT), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
 plt.title('$p_\\mathrm{T}$ distribution of b-tagged jets')
 plt.xlabel('$p_\\mathrm{T}$')
 plt.ylabel('relevant strenth')
 plt.yscale('log')
 plt.legend()
 plt.tight_layout()
-plt.savefig('JetPlotCS10.pdf')
+plt.savefig('JetPTCS10.pdf')
+
+plt.figure(figsize=(10, 6))
+for root in root10:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetEta = Collect['Jet/Jet.Eta'].array(library='np')
+            n = len(JetEta)
+            if n < 1000:
+                raise ValueError(f'n = {n} too small')
+            JetEta = np.concatenate(JetEta)
+            print(f'{root}: {n} events, {len(JetEta)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetEta, 50, weights=[cs / n] * len(JetEta), histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetEta, 50, weights=[cs / n] * len(JetEta), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('$\\eta$ distribution of b-tagged jets')
+plt.xlabel('$\\eta$')
+plt.ylabel('relevant strenth')
+plt.yscale('log')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetEtaCS10.pdf')
+
+plt.figure(figsize=(10, 6))
+for root in root10:
+    cs = CS[root]
+    with uproot.open(root) as file:
+        Collect = file['Collect']
+        try:
+            JetMass = Collect['Jet/Jet.Mass'].array(library='np')
+            n = len(JetMass)
+            JetMass = np.concatenate(JetMass)
+            print(f'{root}: {n} events, {len(JetMass)} b-jets')
+        except ValueError:
+            print(f'{root}: {n} events')
+            continue
+        if root[:6] == 'mumuEE' or root[:6] == 'mumuNN':
+            plt.hist(JetMass, 50, weights=[cs / n] * len(JetMass), histtype='step', label=root.replace('_collect_min', '')[:-5])
+        else:
+            plt.hist(JetMass, 50, weights=[cs / n] * len(JetMass), histtype='barstacked', label=root.replace('_collect_min', '')[:-5])
+plt.title('mass distribution of b-tagged jets')
+plt.xlabel('mass')
+plt.ylabel('relevant strenth')
+plt.yscale('log')
+plt.legend()
+plt.tight_layout()
+plt.savefig('JetMassCS10.pdf')
