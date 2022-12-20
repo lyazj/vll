@@ -254,6 +254,33 @@ void Collect(const string &directory, bool minmode = 0)
   Float_t *BrW = new Float_t[2];
   Collect->Branch("Weight", BrW, "Weight[2]/F");
 
+  UInt_t *BrTauNumber = new UInt_t;
+  Collect->Branch("TauNumber", BrTauNumber, "TauNumber/i");
+
+  Float_t *BrTauPT = new Float_t[NUMBER_MAX];
+  Collect->Branch("TauPT", BrTauPT, "TauPT[TauNumber]/F");
+
+  Float_t *BrTauEta = new Float_t[NUMBER_MAX];
+  Collect->Branch("TauEta", BrTauEta, "TauEta[TauNumber]/F");
+
+  Float_t *BrTauPhi = new Float_t[NUMBER_MAX];
+  Collect->Branch("TauPhi", BrTauPhi, "TauPhi[TauNumber]/F");
+
+  Float_t *BrTauE = new Float_t[NUMBER_MAX];
+  Collect->Branch("TauE", BrTauE, "TauE[TauNumber]/F");
+
+  UInt_t *BrTauBNumber = new UInt_t;
+  Collect->Branch("TauBNumber", BrTauBNumber, "TauBNumber/i");
+
+  UInt_t *BrB50Number = new UInt_t;
+  Collect->Branch("B50Number", BrB50Number, "B50Number/i");
+
+  UInt_t *BrB70Number = new UInt_t;
+  Collect->Branch("B70Number", BrB70Number, "B70Number/i");
+
+  UInt_t *BrB90Number = new UInt_t;
+  Collect->Branch("B90Number", BrB90Number, "B90Number/i");
+
   UInt_t *BrJetNumber = new UInt_t;
   Collect->Branch("JetNumber", BrJetNumber, "JetNumber/i");
 
@@ -271,9 +298,6 @@ void Collect(const string &directory, bool minmode = 0)
 
   UInt_t *BrJetBTag = new UInt_t[NUMBER_MAX];
   Collect->Branch("JetBTag", BrJetBTag, "JetBTag[JetNumber]/i");
-
-  UInt_t *BrJetTauTag = new UInt_t[NUMBER_MAX];
-  Collect->Branch("JetTauTag", BrJetTauTag, "JetTauTag[JetNumber]/i");
 
   UInt_t *BrElectronNumber = new UInt_t;
   Collect->Branch("ElectronNumber", BrElectronNumber, "ElectronNumber/i");
@@ -347,7 +371,12 @@ void Collect(const string &directory, bool minmode = 0)
     Long64_t nmuon = BrMuon->GetEntries();
     Long64_t njet = VLCjetR05->GetEntries();
     Long64_t nmet = BrMissingET->GetEntries();
-    Long64_t c = 0;
+    Long64_t ctau = 0;
+    Long64_t cjet = 0;
+    Long64_t ctaub = 0;
+    Long64_t cb50 = 0;
+    Long64_t cb70 = 0;
+    Long64_t cb90 = 0;
 
     assert(nevent == 1);
     assert(nweight == 2);
@@ -418,17 +447,36 @@ void Collect(const string &directory, bool minmode = 0)
 
       if(valid)
       {
-        BrJetPT[c] = pj.Pt();
-        BrJetEta[c] = pj.Eta();
-        BrJetPhi[c] = pj.Phi();
-        BrJetE[c] = pj.E();
-        BrJetBTag[c] = jet->BTag;
-        BrJetTauTag[c] = jet->TauTag;
-        ++c;
+        if(jet->TauTag)
+        {
+          BrTauPT[ctau] = pj.Pt();
+          BrTauEta[ctau] = pj.Eta();
+          BrTauPhi[ctau] = pj.Phi();
+          BrTauE[ctau] = pj.E();
+          ++ctau;
+          if(jet->BTag)
+            ++ctaub;
+        }
+        else
+        {
+          BrJetPT[cjet] = pj.Pt();
+          BrJetEta[cjet] = pj.Eta();
+          BrJetPhi[cjet] = pj.Phi();
+          BrJetE[cjet] = pj.E();
+          BrJetBTag[cjet] = jet->BTag;
+          ++cjet;
+          cb50 += (jet->BTag >> 0) & 1;
+          cb70 += (jet->BTag >> 1) & 1;
+          cb90 += (jet->BTag >> 2) & 1;
+        }
       }
-
     }
-    *BrJetNumber = c;
+    *BrTauNumber = ctau;
+    *BrTauBNumber = ctaub;
+    *BrB50Number = cb50;
+    *BrB70Number = cb70;
+    *BrB90Number = cb90;
+    *BrJetNumber = cjet;
 
     MissingET *missingET = (MissingET *)BrMissingET->At(0);
     *BrMET = missingET->MET;
@@ -459,13 +507,21 @@ void Collect(const string &directory, bool minmode = 0)
   delete[] BrElectronEta;
   delete[] BrElectronPT;
   delete BrElectronNumber;
-  delete[] BrJetTauTag;
   delete[] BrJetBTag;
   delete[] BrJetE;
   delete[] BrJetPhi;
   delete[] BrJetEta;
   delete[] BrJetPT;
   delete BrJetNumber;
+  delete BrB90Number;
+  delete BrB70Number;
+  delete BrB50Number;
+  delete BrTauBNumber;
+  delete[] BrTauE;
+  delete[] BrTauPhi;
+  delete[] BrTauEta;
+  delete[] BrTauPT;
+  delete BrTauNumber;
   delete[] BrW;
   delete BrHepMCCS;
   delete BrHepMCWeight;
