@@ -8,55 +8,62 @@
 #include <unistd.h>
 #include <err.h>
 
+#define NUMBER_MAX 1024
+
+#undef assert
+#define assert(expr) do { \
+  if(!(expr)) throw runtime_error("assertion failed: " #expr); \
+} while(0)
+
 vector<string> branch_names = {
-  "Event",
-  "Weight",
-  "Particle",
-  "GenJet",
-  "KTjet",
-  // "VLCjetR05N2",
-  // "VLCjetR05N3",
-  // "VLCjetR05N4",
-  // "VLCjetR05N5",
-  // "VLCjetR05N6",
-  // "VLCjetR07N2",
-  // "VLCjetR07N3",
-  // "VLCjetR07N4",
-  // "VLCjetR07N5",
-  // "VLCjetR07N6",
-  // "VLCjetR10N2",
-  // "VLCjetR10N3",
-  // "VLCjetR10N4",
-  // "VLCjetR10N5",
-  // "VLCjetR10N6",
-  // "VLCjetR12N2",
-  // "VLCjetR12N3",
-  // "VLCjetR12N4",
-  // "VLCjetR12N5",
-  // "VLCjetR12N6",
-  // "VLCjetR15N2",
-  // "VLCjetR15N3",
-  // "VLCjetR15N4",
-  // "VLCjetR15N5",
-  // "VLCjetR15N6",
-  // "VLCjetR02_inclusive",
-  "VLCjetR05_inclusive",
-  // "VLCjetR07_inclusive",
-  // "VLCjetR10_inclusive",
-  // "VLCjetR12_inclusive",
-  // "VLCjetR15_inclusive",
-  "GenMissingET",
-  "Track",
-  "Tower",
-  "EFlowTrack",
-  "EFlowPhoton",
-  "EFlowNeutralHadron",
-  "Photon",
-  "Electron",
-  "Muon",
-  "ForwardMuon",
-  "MissingET",
-  "ScalarHT",
+  // "Event",
+  // "Weight",
+  // "Particle",
+  // "GenJet",
+  // "KTjet",
+  // // "VLCjetR05N2",
+  // // "VLCjetR05N3",
+  // // "VLCjetR05N4",
+  // // "VLCjetR05N5",
+  // // "VLCjetR05N6",
+  // // "VLCjetR07N2",
+  // // "VLCjetR07N3",
+  // // "VLCjetR07N4",
+  // // "VLCjetR07N5",
+  // // "VLCjetR07N6",
+  // // "VLCjetR10N2",
+  // // "VLCjetR10N3",
+  // // "VLCjetR10N4",
+  // // "VLCjetR10N5",
+  // // "VLCjetR10N6",
+  // // "VLCjetR12N2",
+  // // "VLCjetR12N3",
+  // // "VLCjetR12N4",
+  // // "VLCjetR12N5",
+  // // "VLCjetR12N6",
+  // // "VLCjetR15N2",
+  // // "VLCjetR15N3",
+  // // "VLCjetR15N4",
+  // // "VLCjetR15N5",
+  // // "VLCjetR15N6",
+  // // "VLCjetR02_inclusive",
+  // "VLCjetR05_inclusive",
+  // // "VLCjetR07_inclusive",
+  // // "VLCjetR10_inclusive",
+  // // "VLCjetR12_inclusive",
+  // // "VLCjetR15_inclusive",
+  // "GenMissingET",
+  // "Track",
+  // "Tower",
+  // "EFlowTrack",
+  // "EFlowPhoton",
+  // "EFlowNeutralHadron",
+  // "Photon",
+  // "Electron",
+  // "Muon",
+  // "ForwardMuon",
+  // "MissingET",
+  // "ScalarHT",
 };
 
 vector<string> directories = {
@@ -226,77 +233,209 @@ void Collect(const string &directory, bool minmode = 0)
     Delphes->Add(rootfile.c_str());
 
   ExRootTreeReader *reader = new ExRootTreeReader(Delphes);
+  TClonesArray *BrEvent = reader->UseBranch("Event");
+  TClonesArray *BrWeight = reader->UseBranch("Weight");
   TClonesArray *BrElectron = reader->UseBranch("Electron");
   TClonesArray *BrMuon = reader->UseBranch("Muon");
   TClonesArray *VLCjetR05 = reader->UseBranch("VLCjetR05_inclusive");
+  TClonesArray *BrMissingET = reader->UseBranch("MissingET");
   Long64_t entries = min(entries_max, reader->GetEntries());
 
   TFile *outfile = new TFile((label + "_collect_" + (minmode ? "min_" : "")
         + mass + "_" + cme + ".root").c_str(), "recreate");
   TTree *Collect = new TTree("Collect", "Collected features for analysis");
-  TClonesArray *BrJet = new TClonesArray("Jet", 10);
-  Collect->Branch("Jet", &BrJet);
+
+  Float_t *BrHepMCWeight = new Float_t;
+  Collect->Branch("HepMCWeight", BrHepMCWeight, "HepMCWeight/F");
+
+  Float_t *BrHepMCCS = new Float_t;
+  Collect->Branch("HepMCCS", BrHepMCCS, "HepMCCS/F");
+
+  Float_t *BrW = new Float_t[2];
+  Collect->Branch("Weight", BrW, "Weight[2]/F");
+
+  UInt_t *BrJetNumber = new UInt_t;
+  Collect->Branch("JetNumber", BrJetNumber, "JetNumber/i");
+
+  Float_t *BrJetPT = new Float_t[NUMBER_MAX];
+  Collect->Branch("JetPT", BrJetPT, "JetPT[JetNumber]/F");
+
+  Float_t *BrJetEta = new Float_t[NUMBER_MAX];
+  Collect->Branch("JetEta", BrJetEta, "JetEta[JetNumber]/F");
+
+  Float_t *BrJetPhi = new Float_t[NUMBER_MAX];
+  Collect->Branch("JetPhi", BrJetPhi, "JetPhi[JetNumber]/F");
+
+  Float_t *BrJetE = new Float_t[NUMBER_MAX];
+  Collect->Branch("JetE", BrJetE, "JetE[JetNumber]/F");
+
+  UInt_t *BrJetBTag = new UInt_t[NUMBER_MAX];
+  Collect->Branch("JetBTag", BrJetBTag, "JetBTag[JetNumber]/i");
+
+  UInt_t *BrJetTauTag = new UInt_t[NUMBER_MAX];
+  Collect->Branch("JetTauTag", BrJetTauTag, "JetTauTag[JetNumber]/i");
+
+  UInt_t *BrElectronNumber = new UInt_t;
+  Collect->Branch("ElectronNumber", BrElectronNumber, "ElectronNumber/i");
+
+  Float_t *BrElectronPT = new Float_t[NUMBER_MAX];
+  Collect->Branch("ElectronPT", BrElectronPT, "ElectronPT[ElectronNumber]/F");
+
+  Float_t *BrElectronEta = new Float_t[NUMBER_MAX];
+  Collect->Branch("ElectronEta", BrElectronEta, "ElectronEta[ElectronNumber]/F");
+
+  Float_t *BrElectronPhi = new Float_t[NUMBER_MAX];
+  Collect->Branch("ElectronPhi", BrElectronPhi, "ElectronPhi[ElectronNumber]/F");
+
+  Float_t *BrElectronE = new Float_t[NUMBER_MAX];
+  Collect->Branch("ElectronE", BrElectronE, "ElectronE[ElectronNumber]/F");
+
+  UInt_t *BrMuonNumber = new UInt_t;
+  Collect->Branch("MuonNumber", BrMuonNumber, "MuonNumber/i");
+
+  Float_t *BrMuonPT = new Float_t[NUMBER_MAX];
+  Collect->Branch("MuonPT", BrMuonPT, "MuonPT[MuonNumber]/F");
+
+  Float_t *BrMuonEta = new Float_t[NUMBER_MAX];
+  Collect->Branch("MuonEta", BrMuonEta, "MuonEta[MuonNumber]/F");
+
+  Float_t *BrMuonPhi = new Float_t[NUMBER_MAX];
+  Collect->Branch("MuonPhi", BrMuonPhi, "MuonPhi[MuonNumber]/F");
+
+  Float_t *BrMuonE = new Float_t[NUMBER_MAX];
+  Collect->Branch("MuonE", BrMuonE, "MuonE[MuonNumber]/F");
+
+  UInt_t *BrLeptonNumber = new UInt_t;
+  Collect->Branch("LeptonNumber", BrLeptonNumber, "LeptonNumber/i");
+
+  Float_t *BrMET = new Float_t;
+  Collect->Branch("MET", BrMET, "MET/F");
+
+  Float_t *BrMETEta = new Float_t;
+  Collect->Branch("METEta", BrMETEta, "METEta/F");
+
+  Float_t *BrMETPhi = new Float_t;
+  Collect->Branch("METPhi", BrMETPhi, "METPhi/F");
+
   for(const string &branch_name : branch_names)
   {
     TClonesArray *array;
-    if(branch_name == "Electron")
+    if(branch_name == "Event")
+      array = BrEvent;
+    else if(branch_name == "Weight")
+      array = BrWeight;
+    else if(branch_name == "Electron")
       array = BrElectron;
     else if(branch_name == "Muon")
       array = BrMuon;
     else if(branch_name == "VLCjetR05_inclusive")
       array = VLCjetR05;
+    else if(branch_name == "MissingET")
+      array = BrMissingET;
     else
       array = reader->UseBranch(branch_name.c_str());
-    Collect->Branch(branch_name.c_str(), &array);
+    Collect->Branch(branch_name.c_str(), array);
   }
 
   for(Long64_t entry = 0; entry < entries; ++entry)
   {
     reader->ReadEntry(entry);
 
+    Long64_t nevent = BrEvent->GetEntries();
+    Long64_t nweight = BrWeight->GetEntries();
+    Long64_t nelectron = BrElectron->GetEntries();
+    Long64_t nmuon = BrMuon->GetEntries();
     Long64_t njet = VLCjetR05->GetEntries();
+    Long64_t nmet = BrMissingET->GetEntries();
     Long64_t c = 0;
+
+    assert(nevent == 1);
+    assert(nweight == 2);
+    assert(nelectron <= NUMBER_MAX);
+    assert(nmuon <= NUMBER_MAX);
+    assert(njet <= NUMBER_MAX);
+    assert(nmet == 1);
+    *BrElectronNumber = nelectron;
+    *BrMuonNumber = nmuon;
+    *BrLeptonNumber = nelectron + nmuon;
+
+    HepMCEvent *event = (HepMCEvent *)BrEvent->At(0);
+    *BrHepMCWeight = event->Weight;
+    *BrHepMCCS = event->CrossSection;
+
+    Weight *weight = (Weight *)BrWeight->At(0);
+    BrW[0] = weight->Weight;
+    weight = (Weight *)BrWeight->At(1);
+    BrW[1] = weight->Weight;
+
+    vector<TLorentzVector> pes;
+    for(Long64_t i = 0; i < nelectron; ++i)
+    {
+      Electron *electron = (Electron *)BrElectron->At(i);
+      TLorentzVector pe = electron->P4();
+      pes.push_back(pe);
+      BrElectronPT[i] = pe.Pt();
+      BrElectronEta[i] = pe.Eta();
+      BrElectronPhi[i] = pe.Phi();
+      BrElectronE[i] = pe.E();
+    }
+
+    vector<TLorentzVector> pms;
+    for(Long64_t i = 0; i < nmuon; ++i)
+    {
+      Muon *muon = (Muon *)BrMuon->At(i);
+      TLorentzVector pm = muon->P4();
+      pms.push_back(pm);
+      BrMuonPT[i] = pm.Pt();
+      BrMuonEta[i] = pm.Eta();
+      BrMuonPhi[i] = pm.Phi();
+      BrMuonE[i] = pm.E();
+    }
 
     for(Long64_t i = 0; i < njet; ++i)
     {
       Jet *jet = (Jet *)VLCjetR05->At(i);
-      if(jet->BTag)  // TODO check why BTag out of 0 and 1
+      bool valid = 1;
+      TLorentzVector pj = jet->P4();
+
+      for(const TLorentzVector &pe : pes)
       {
-        bool valid = 1;
-        TLorentzVector pj = jet->P4();
-
-        Long64_t nelectron = BrElectron->GetEntries();
-        for(Long64_t j = 0; j < nelectron; ++j)
+        if(pe.Pt() > 20 && near(pj, pe))
         {
-          Electron *electron = (Electron *)BrElectron->At(j);
-          if(near(pj, electron->P4()))
-          {
-            valid = 0;
-            break;
-          }
+          valid = 0;
+          break;
         }
-
-        if(valid)
-        {
-          Long64_t nmuon = BrMuon->GetEntries();
-          for(Long64_t j = 0; j < nmuon; ++j)
-          {
-            Muon *muon = (Muon *)BrMuon->At(j);
-            if(near(pj, muon->P4()))
-            {
-              valid = 0;
-              break;
-            }
-          }
-        }
-
-        if(valid)
-          new((*BrJet)[c++]) Jet(*jet);
       }
-    }
-    Collect->Fill();
-    BrJet->Clear();
 
+      if(valid) for(const TLorentzVector &pm : pms)
+      {
+        if(pm.Pt() > 20 && near(pj, pm))
+        {
+          valid = 0;
+          break;
+        }
+      }
+
+      if(valid)
+      {
+        BrJetPT[c] = pj.Pt();
+        BrJetEta[c] = pj.Eta();
+        BrJetPhi[c] = pj.Phi();
+        BrJetE[c] = pj.E();
+        BrJetBTag[c] = jet->BTag;
+        BrJetTauTag[c] = jet->TauTag;
+        ++c;
+      }
+
+    }
+    *BrJetNumber = c;
+
+    MissingET *missingET = (MissingET *)BrMissingET->At(0);
+    *BrMET = missingET->MET;
+    *BrMETEta = missingET->Eta;
+    *BrMETPhi = missingET->Phi;
+
+    Collect->Fill();
     if((entry + 1) % 1000 == 0)
       clog << "Processing " << directory << ": "
         << setw(to_string(entries).length()) << (entry + 1)
@@ -306,7 +445,30 @@ void Collect(const string &directory, bool minmode = 0)
   // Collect->Print();
   Collect->Write();
 
-  delete BrJet;
+  delete BrMETPhi;
+  delete BrMETEta;
+  delete BrMET;
+  delete BrLeptonNumber;
+  delete[] BrMuonE;
+  delete[] BrMuonPhi;
+  delete[] BrMuonEta;
+  delete[] BrMuonPT;
+  delete BrMuonNumber;
+  delete[] BrElectronE;
+  delete[] BrElectronPhi;
+  delete[] BrElectronEta;
+  delete[] BrElectronPT;
+  delete BrElectronNumber;
+  delete[] BrJetTauTag;
+  delete[] BrJetBTag;
+  delete[] BrJetE;
+  delete[] BrJetPhi;
+  delete[] BrJetEta;
+  delete[] BrJetPT;
+  delete BrJetNumber;
+  delete[] BrW;
+  delete BrHepMCCS;
+  delete BrHepMCWeight;
   delete Collect;
   delete outfile;
   delete reader;
